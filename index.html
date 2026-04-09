@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BetterControl+ · mindful monthly spend</title>
+        <!-- Tailwind + typography -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- subtle font: Inter for clean, sophisticated look -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            * {
+                font-family:
+                    "Inter",
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+            }
+            .logo {
+                letter-spacing: -0.02em;
+                font-weight: 350;
+                font-style: italic;
+            }
+            .logo strong {
+                font-weight: 500;
+                font-style: normal;
+            }
+            .logo-plus {
+                font-weight: 300;
+                font-size: 1.2em;
+                margin-left: 2px;
+            }
+            .card-hover {
+                transition: all 0.1s ease;
+            }
+            .fade-in {
+                animation: fade 0.2s ease;
+            }
+            @keyframes fade {
+                from {
+                    opacity: 0.5;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+        </style>
+    </head>
+    <body
+        class="bg-neutral-50 text-neutral-800 antialiased min-h-screen flex items-start justify-center p-4 md:p-6"
+    >
+        <!-- main container: switches between intro and app -->
+        <div id="appRoot" class="w-full max-w-4xl">
+            <!-- ========== INTRO VIEW ========== -->
+            <div
+                id="introView"
+                class="flex flex-col items-center justify-center min-h-[85vh] text-center px-4"
+            >
+                <div class="space-y-6 max-w-xl">
+                    <!-- Sophisticated typographic logo -->
+                    <div
+                        class="text-6xl md:text-7xl logo text-neutral-800 tracking-tight"
+                    >
+                        Better<span class="font-light italic">Control</span
+                        ><span class="logo-plus align-super text-3xl ml-0.5"
+                            >+</span
+                        >
+                    </div>
+                    <p
+                        class="text-lg md:text-xl text-neutral-500 font-light leading-relaxed"
+                    >
+                        Monthly spending, simplified.
+                        <br class="hidden sm:block" />No formulas. Just clarity.
+                    </p>
+                    <div class="h-6"></div>
+                    <button
+                        id="startBtn"
+                        class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-neutral-800 rounded-full hover:bg-neutral-700 transition-all shadow-sm hover:shadow-md"
+                    >
+                        <span>Start controlling</span>
+                        <span
+                            class="ml-2 text-xl font-thin group-hover:translate-x-0.5 transition-transform"
+                            >→</span
+                        >
+                    </button>
+                    <p class="text-sm text-neutral-400 mt-8">
+                        Your data stays in this browser · local only
+                    </p>
+                </div>
+            </div>
+
+            <!-- ========== APP VIEW (hidden by default) ========== -->
+            <div id="appView" class="hidden fade-in">
+                <!-- header with logo (compact) + import/export -->
+                <div
+                    class="flex flex-wrap items-center justify-between gap-3 mb-6"
+                >
+                    <div class="flex items-baseline">
+                        <h1 class="text-3xl logo text-neutral-800">
+                            Better<span class="font-light italic">Control</span
+                            ><span class="logo-plus align-super text-xl ml-0.5"
+                                >+</span
+                            >
+                        </h1>
+                        <span
+                            class="ml-3 text-xs font-medium bg-neutral-200/60 px-2.5 py-1 rounded-full text-neutral-600"
+                            >monthly</span
+                        >
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button
+                            id="exportJSONBtn"
+                            class="text-xs bg-white border border-neutral-200 hover:bg-neutral-100 px-3 py-1.5 rounded-full text-neutral-600 transition"
+                        >
+                            ↓ JSON
+                        </button>
+                        <button
+                            id="exportCSVBtn"
+                            class="text-xs bg-white border border-neutral-200 hover:bg-neutral-100 px-3 py-1.5 rounded-full text-neutral-600 transition"
+                        >
+                            ↓ CSV
+                        </button>
+                        <label
+                            class="text-xs bg-white border border-neutral-200 hover:bg-neutral-100 px-3 py-1.5 rounded-full text-neutral-600 transition cursor-pointer"
+                        >
+                            ↑ Import
+                            <input
+                                type="file"
+                                id="importFileInput"
+                                accept=".json,.csv,application/json,text/csv"
+                                class="hidden"
+                            />
+                        </label>
+                        <button
+                            id="backToIntroBtn"
+                            class="text-xs text-neutral-400 hover:text-neutral-600 underline-offset-2 hover:underline ml-1"
+                        >
+                            ← intro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- month selector + total card -->
+                <div
+                    class="flex flex-wrap items-center justify-between gap-3 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-neutral-200/60 shadow-sm mb-6"
+                >
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium text-neutral-500"
+                            >Month</label
+                        >
+                        <select
+                            id="monthSelect"
+                            class="bg-transparent border-b border-neutral-300 py-1.5 pl-1 pr-6 text-lg font-medium focus:outline-none focus:border-neutral-800 transition"
+                        ></select>
+                    </div>
+                    <div class="text-right">
+                        <div
+                            class="text-xs uppercase tracking-wider text-neutral-400"
+                        >
+                            total spend
+                        </div>
+                        <div
+                            id="totalDisplay"
+                            class="text-3xl font-light tabular-nums"
+                        >
+                            $0.00
+                        </div>
+                    </div>
+                </div>
+
+                <!-- add entry form (minimal) -->
+                <div
+                    class="bg-white p-5 rounded-2xl border border-neutral-200/70 shadow-sm mb-8"
+                >
+                    <h2
+                        class="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-3"
+                    >
+                        New entry
+                    </h2>
+                    <form
+                        id="entryForm"
+                        class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end"
+                    >
+                        <div class="md:col-span-1">
+                            <label class="block text-xs text-neutral-400 mb-1"
+                                >date (optional)</label
+                            >
+                            <input
+                                type="date"
+                                id="entryDate"
+                                class="w-full border border-neutral-200 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-neutral-400 outline-none"
+                            />
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs text-neutral-400 mb-1"
+                                >name</label
+                            >
+                            <input
+                                type="text"
+                                id="entryName"
+                                placeholder="e.g. Netflix"
+                                class="w-full border border-neutral-200 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-neutral-400 outline-none"
+                            />
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs text-neutral-400 mb-1"
+                                >category</label
+                            >
+                            <select
+                                id="entryCategory"
+                                class="w-full border border-neutral-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-1 focus:ring-neutral-400 outline-none"
+                            ></select>
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs text-neutral-400 mb-1"
+                                >amount ($)</label
+                            >
+                            <input
+                                type="number"
+                                id="entryAmount"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                class="w-full border border-neutral-200 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-neutral-400 outline-none"
+                                required
+                            />
+                        </div>
+                        <div class="md:col-span-1">
+                            <button
+                                type="submit"
+                                class="w-full bg-neutral-800 text-white py-2.5 px-4 rounded-xl text-sm font-medium hover:bg-neutral-700 transition"
+                            >
+                                Add entry
+                            </button>
+                        </div>
+                    </form>
+                    <!-- custom category hint -->
+                    <p class="text-xs text-neutral-400 mt-2">
+                        Choose “➕ new category” to create your own.
+                    </p>
+                </div>
+
+                <!-- entries list -->
+                <div
+                    class="bg-white/60 rounded-2xl border border-neutral-200/50 p-1"
+                >
+                    <div
+                        class="px-4 py-3 flex items-center justify-between border-b border-neutral-100"
+                    >
+                        <span class="text-sm font-medium text-neutral-600"
+                            >Entries this month</span
+                        >
+                        <span class="text-xs text-neutral-400" id="entryCount"
+                            >0 items</span
+                        >
+                    </div>
+                    <div id="entriesList" class="divide-y divide-neutral-100">
+                        <!-- dynamic entries -->
+                    </div>
+                    <div
+                        id="emptyState"
+                        class="py-12 text-center text-neutral-400 text-sm italic"
+                    >
+                        No entries yet. Add your first spend above.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                "use strict";
+
+                // ----- STATE -----
+                let entries = []; // { id, date, name, category, amount }
+                let categories = [
+                    "Online Subscriptions",
+                    "Health",
+                    "Rent",
+                    "Car-related",
+                    "Food",
+                    "Utilities",
+                    "Entertainment",
+                    "Other",
+                ];
+
+                // Current month filter (YYYY-MM)
+                let currentMonth = new Date().toISOString().slice(0, 7); // "2026-04"
+
+                // DOM elements
+                const introView = document.getElementById("introView");
+                const appView = document.getElementById("appView");
+                const startBtn = document.getElementById("startBtn");
+                const backToIntroBtn =
+                    document.getElementById("backToIntroBtn");
+                const monthSelect = document.getElementById("monthSelect");
+                const totalDisplay = document.getElementById("totalDisplay");
+                const entriesListDiv = document.getElementById("entriesList");
+                const emptyStateDiv = document.getElementById("emptyState");
+                const entryCountSpan = document.getElementById("entryCount");
+                const entryForm = document.getElementById("entryForm");
+                const entryDate = document.getElementById("entryDate");
+                const entryName = document.getElementById("entryName");
+                const entryCategory = document.getElementById("entryCategory");
+                const entryAmount = document.getElementById("entryAmount");
+                const exportJSONBtn = document.getElementById("exportJSONBtn");
+                const exportCSVBtn = document.getElementById("exportCSVBtn");
+                const importFileInput =
+                    document.getElementById("importFileInput");
+
+                // Set default date to today
+                const today = new Date().toISOString().slice(0, 10);
+                entryDate.value = today;
+
+                // ----- LOCAL STORAGE -----
+                const STORAGE_KEY = "bettercontrol_app";
+
+                function loadFromStorage() {
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored) {
+                        try {
+                            const data = JSON.parse(stored);
+                            if (data.entries) entries = data.entries;
+                            if (
+                                data.categories &&
+                                Array.isArray(data.categories)
+                            ) {
+                                // merge with defaults but keep custom
+                                const defaultCats = [
+                                    "Online Subscriptions",
+                                    "Health",
+                                    "Rent",
+                                    "Car-related",
+                                    "Food",
+                                    "Utilities",
+                                    "Entertainment",
+                                    "Other",
+                                ];
+                                const merged = [
+                                    ...new Set([
+                                        ...defaultCats,
+                                        ...data.categories,
+                                    ]),
+                                ];
+                                categories = merged;
+                            }
+                            if (data.currentMonth)
+                                currentMonth = data.currentMonth;
+                        } catch (e) {
+                            /* fallback */
+                        }
+                    }
+                    // ensure default categories are present
+                    const base = [
+                        "Online Subscriptions",
+                        "Health",
+                        "Rent",
+                        "Car-related",
+                        "Food",
+                        "Utilities",
+                        "Entertainment",
+                        "Other",
+                    ];
+                    categories = [...new Set([...base, ...categories])];
+                }
+
+                function saveToStorage() {
+                    const data = {
+                        entries,
+                        categories,
+                        currentMonth,
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                }
+
+                // ----- HELPERS -----
+                function filterEntriesByMonth(monthStr) {
+                    return entries.filter((e) => {
+                        if (!e.date) return false;
+                        return e.date.startsWith(monthStr);
+                    });
+                }
+
+                function calculateTotal(monthEntries) {
+                    return monthEntries.reduce(
+                        (sum, e) => sum + (Number(e.amount) || 0),
+                        0,
+                    );
+                }
+
+                // Populate month dropdown from entries (plus current)
+                function populateMonthSelector() {
+                    const monthsSet = new Set();
+                    entries.forEach((e) => {
+                        if (e.date) monthsSet.add(e.date.slice(0, 7));
+                    });
+                    if (!monthsSet.has(currentMonth))
+                        monthsSet.add(currentMonth);
+                    const sorted = Array.from(monthsSet).sort().reverse();
+
+                    monthSelect.innerHTML = "";
+                    sorted.forEach((m) => {
+                        const opt = document.createElement("option");
+                        opt.value = m;
+                        const [year, month] = m.split("-");
+                        const date = new Date(year, month - 1);
+                        const label = date.toLocaleString("default", {
+                            month: "long",
+                            year: "numeric",
+                        });
+                        opt.textContent = label;
+                        if (m === currentMonth) opt.selected = true;
+                        monthSelect.appendChild(opt);
+                    });
+                    if (sorted.length === 0) {
+                        const opt = document.createElement("option");
+                        opt.value = currentMonth;
+                        opt.textContent = new Date().toLocaleString("default", {
+                            month: "long",
+                            year: "numeric",
+                        });
+                        monthSelect.appendChild(opt);
+                    }
+                }
+
+                // Render categories dropdown (with custom option)
+                function renderCategorySelect() {
+                    const select = entryCategory;
+                    select.innerHTML = "";
+                    categories.forEach((cat) => {
+                        const opt = document.createElement("option");
+                        opt.value = cat;
+                        opt.textContent = cat;
+                        select.appendChild(opt);
+                    });
+                    // add "➕ new category" special option
+                    const newOpt = document.createElement("option");
+                    newOpt.value = "__NEW_CATEGORY__";
+                    newOpt.textContent = "➕ new category";
+                    select.appendChild(newOpt);
+                }
+
+                // Handle category change (if new category selected)
+                entryCategory.addEventListener("change", function (e) {
+                    if (entryCategory.value === "__NEW_CATEGORY__") {
+                        const newCat = prompt("Enter new category name:");
+                        if (newCat && newCat.trim()) {
+                            const trimmed = newCat.trim();
+                            if (!categories.includes(trimmed)) {
+                                categories.push(trimmed);
+                                saveToStorage();
+                                renderCategorySelect();
+                                entryCategory.value = trimmed;
+                            } else {
+                                entryCategory.value = categories[0];
+                                alert("Category already exists.");
+                            }
+                        } else {
+                            // revert to first category
+                            entryCategory.value = categories[0];
+                        }
+                    }
+                });
+
+                // Render entries list for selected month
+                function renderEntries() {
+                    const monthEntries = filterEntriesByMonth(currentMonth);
+                    const total = calculateTotal(monthEntries);
+                    totalDisplay.textContent = `$${total.toFixed(2)}`;
+                    entryCountSpan.textContent = `${monthEntries.length} item${monthEntries.length !== 1 ? "s" : ""}`;
+
+                    if (monthEntries.length === 0) {
+                        entriesListDiv.innerHTML = "";
+                        emptyStateDiv.classList.remove("hidden");
+                        return;
+                    }
+                    emptyStateDiv.classList.add("hidden");
+
+                    // sort by date desc
+                    const sorted = [...monthEntries].sort((a, b) =>
+                        (b.date || "").localeCompare(a.date || ""),
+                    );
+
+                    entriesListDiv.innerHTML = sorted
+                        .map((entry) => {
+                            const dateObj = entry.date
+                                ? new Date(entry.date + "T00:00:00")
+                                : null;
+                            const formattedDate = dateObj
+                                ? dateObj.toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                  })
+                                : "—";
+                            return `
+          <div class="flex items-center justify-between px-4 py-3 hover:bg-neutral-50/80 transition group">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="w-16 text-xs font-mono text-neutral-400">${formattedDate}</div>
+              <div class="min-w-0 flex-1">
+                <div class="font-medium text-neutral-800 truncate">${escapeHtml(entry.name) || "—"}</div>
+                <div class="text-xs text-neutral-400">${escapeHtml(entry.category)}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-base font-medium tabular-nums">$${Number(entry.amount).toFixed(2)}</span>
+              <button data-id="${entry.id}" class="deleteEntryBtn text-neutral-300 hover:text-red-500 transition text-lg leading-5 opacity-0 group-hover:opacity-100" title="delete">🗑️</button>
+            </div>
+          </div>
+        `;
+                        })
+                        .join("");
+
+                    // Attach delete listeners
+                    document
+                        .querySelectorAll(".deleteEntryBtn")
+                        .forEach((btn) => {
+                            btn.addEventListener("click", (e) => {
+                                const id = Number(btn.dataset.id);
+                                entries = entries.filter((e) => e.id !== id);
+                                saveToStorage();
+                                populateMonthSelector();
+                                renderEntries();
+                            });
+                        });
+                }
+
+                // simple escape
+                function escapeHtml(text) {
+                    if (!text) return text;
+                    return String(text).replace(/[&<>"]/g, function (c) {
+                        if (c === "&") return "&amp;";
+                        if (c === "<") return "&lt;";
+                        if (c === ">") return "&gt;";
+                        if (c === '"') return "&quot;";
+                        return c;
+                    });
+                }
+
+                // refresh UI (month selector + entries)
+                function refreshAppUI() {
+                    populateMonthSelector();
+                    renderEntries();
+                    renderCategorySelect();
+                }
+
+                // Add new entry
+                function addEntryFromForm(e) {
+                    e.preventDefault();
+                    const dateVal = entryDate.value; // YYYY-MM-DD
+                    const nameVal = entryName.value.trim();
+                    const categoryVal = entryCategory.value;
+                    const amountVal = parseFloat(entryAmount.value);
+
+                    if (!nameVal) {
+                        alert("Please enter a name/description.");
+                        return;
+                    }
+                    if (isNaN(amountVal) || amountVal < 0) {
+                        alert("Please enter a valid positive amount.");
+                        return;
+                    }
+                    if (categoryVal === "__NEW_CATEGORY__") {
+                        alert(
+                            "Please select a category or create a new one first.",
+                        );
+                        return;
+                    }
+
+                    const finalDate = dateVal || today; // fallback today
+
+                    const newEntry = {
+                        id: Date.now() + Math.floor(Math.random() * 1000),
+                        date: finalDate,
+                        name: nameVal,
+                        category: categoryVal,
+                        amount: amountVal,
+                    };
+
+                    entries.push(newEntry);
+                    saveToStorage();
+
+                    // If the entry's month is not current, we might still want to switch? keep current month.
+                    // But if month not in selector, refresh.
+                    const entryMonth = finalDate.slice(0, 7);
+                    if (
+                        !Array.from(monthSelect.options).some(
+                            (opt) => opt.value === entryMonth,
+                        )
+                    ) {
+                        // it will be added in populate
+                    }
+
+                    // Reset form (keep date, clear others)
+                    entryName.value = "";
+                    entryAmount.value = "";
+                    entryCategory.value = categories[0];
+                    entryDate.value = today;
+
+                    refreshAppUI();
+                }
+
+                // Month change
+                monthSelect.addEventListener("change", (e) => {
+                    currentMonth = e.target.value;
+                    saveToStorage();
+                    renderEntries();
+                });
+
+                // ----- IMPORT / EXPORT -----
+                function exportAsJSON() {
+                    const dataStr = JSON.stringify(
+                        { entries, categories },
+                        null,
+                        2,
+                    );
+                    downloadFile(
+                        dataStr,
+                        "bettercontrol_backup.json",
+                        "application/json",
+                    );
+                }
+
+                function exportAsCSV() {
+                    // headers: date,name,category,amount
+                    const headers = ["date", "name", "category", "amount"];
+                    const rows = entries.map((e) => [
+                        e.date || "",
+                        `"${(e.name || "").replace(/"/g, '""')}"`,
+                        `"${(e.category || "").replace(/"/g, '""')}"`,
+                        e.amount,
+                    ]);
+                    const csvContent = [
+                        headers.join(","),
+                        ...rows.map((r) => r.join(",")),
+                    ].join("\n");
+                    downloadFile(
+                        csvContent,
+                        "bettercontrol_entries.csv",
+                        "text/csv",
+                    );
+                }
+
+                function downloadFile(content, fileName, mimeType) {
+                    const blob = new Blob([content], { type: mimeType });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = fileName;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                }
+
+                function handleImport(file) {
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const content = ev.target.result;
+                        const isJSON =
+                            file.name.endsWith(".json") ||
+                            content.trim().startsWith("{");
+                        try {
+                            if (isJSON) {
+                                const imported = JSON.parse(content);
+                                if (imported.entries)
+                                    entries = imported.entries;
+                                if (imported.categories) {
+                                    categories = [
+                                        ...new Set([
+                                            ...categories,
+                                            ...imported.categories,
+                                        ]),
+                                    ];
+                                }
+                            } else {
+                                // CSV parse (simple)
+                                const lines = content
+                                    .split("\n")
+                                    .filter((l) => l.trim());
+                                if (lines.length < 2) {
+                                    alert("CSV seems empty");
+                                    return;
+                                }
+                                const headers = lines[0]
+                                    .toLowerCase()
+                                    .split(",")
+                                    .map((h) => h.trim().replace(/^"|"$/g, ""));
+                                const dateIdx = headers.indexOf("date");
+                                const nameIdx = headers.indexOf("name");
+                                const catIdx = headers.indexOf("category");
+                                const amtIdx = headers.indexOf("amount");
+                                if (
+                                    dateIdx === -1 ||
+                                    nameIdx === -1 ||
+                                    catIdx === -1 ||
+                                    amtIdx === -1
+                                ) {
+                                    alert(
+                                        "CSV must contain date,name,category,amount columns",
+                                    );
+                                    return;
+                                }
+                                const newEntries = [];
+                                for (let i = 1; i < lines.length; i++) {
+                                    const cols = parseCSVLine(lines[i]);
+                                    if (
+                                        cols.length <=
+                                        Math.max(
+                                            dateIdx,
+                                            nameIdx,
+                                            catIdx,
+                                            amtIdx,
+                                        )
+                                    )
+                                        continue;
+                                    const dateVal = cols[dateIdx]?.trim();
+                                    const nameVal = cols[nameIdx]
+                                        ?.trim()
+                                        .replace(/^"|"$/g, "");
+                                    const catVal = cols[catIdx]
+                                        ?.trim()
+                                        .replace(/^"|"$/g, "");
+                                    const amtVal = parseFloat(cols[amtIdx]);
+                                    if (
+                                        !dateVal ||
+                                        !nameVal ||
+                                        !catVal ||
+                                        isNaN(amtVal)
+                                    )
+                                        continue;
+                                    newEntries.push({
+                                        id: Date.now() + i + Math.random(),
+                                        date: dateVal,
+                                        name: nameVal,
+                                        category: catVal,
+                                        amount: amtVal,
+                                    });
+                                    if (!categories.includes(catVal))
+                                        categories.push(catVal);
+                                }
+                                entries = [...entries, ...newEntries];
+                            }
+                            saveToStorage();
+                            refreshAppUI();
+                            alert("Import successful.");
+                        } catch (err) {
+                            alert("Failed to import file. Invalid format.");
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+
+                function parseCSVLine(line) {
+                    const result = [];
+                    let current = "";
+                    let inQuotes = false;
+                    for (let char of line) {
+                        if (char === '"' && !inQuotes) {
+                            inQuotes = true;
+                        } else if (char === '"' && inQuotes) {
+                            inQuotes = false;
+                        } else if (char === "," && !inQuotes) {
+                            result.push(current);
+                            current = "";
+                        } else {
+                            current += char;
+                        }
+                    }
+                    result.push(current);
+                    return result;
+                }
+
+                // ----- VIEW SWITCHING -----
+                function showIntro() {
+                    introView.classList.remove("hidden");
+                    appView.classList.add("hidden");
+                }
+                function showApp() {
+                    introView.classList.add("hidden");
+                    appView.classList.remove("hidden");
+                    refreshAppUI();
+                }
+
+                // ----- INITIALIZE -----
+                function init() {
+                    loadFromStorage();
+
+                    // ensure each entry has an id (migration)
+                    entries = entries.map((e) => {
+                        if (!e.id) e.id = Date.now() + Math.random();
+                        return e;
+                    });
+                    saveToStorage();
+
+                    // default view: if first time? we show intro.
+                    const hasSeenApp = localStorage.getItem("bc_seen_app");
+                    if (hasSeenApp === "true") {
+                        showApp();
+                    } else {
+                        showIntro();
+                    }
+
+                    // Event listeners
+                    startBtn.addEventListener("click", () => {
+                        localStorage.setItem("bc_seen_app", "true");
+                        showApp();
+                    });
+                    backToIntroBtn.addEventListener("click", () => {
+                        showIntro();
+                    });
+
+                    entryForm.addEventListener("submit", addEntryFromForm);
+
+                    exportJSONBtn.addEventListener("click", exportAsJSON);
+                    exportCSVBtn.addEventListener("click", exportAsCSV);
+
+                    importFileInput.addEventListener("change", (e) => {
+                        const file = e.target.files[0];
+                        if (file) handleImport(file);
+                        importFileInput.value = "";
+                    });
+
+                    // Prepopulate month selector & categories on app start
+                    renderCategorySelect();
+
+                    // If we start in app view, refresh.
+                    if (!introView.classList.contains("hidden")) {
+                        // but wait until shown
+                    }
+                }
+
+                init();
+            })();
+        </script>
+        <!-- subtle footer / attribution (minimal) -->
+        <div class="hidden">BetterControl+ — local, mindful spending.</div>
+    </body>
+</html>
