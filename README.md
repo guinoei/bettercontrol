@@ -1,5 +1,7 @@
 # BetterControl+
 
+https://guinoei.github.io/bettercontrol/
+
 **Minimalist monthly spending control. No spreadsheets. No complexity. Just clarity.**
 
 BetterControl+ is a lightweight, browser-based financial tracker designed for individuals who want to monitor monthly expenses without the friction of formulas, accounts, or cloud services. Every entry stays on your device—powered entirely by local storage.
