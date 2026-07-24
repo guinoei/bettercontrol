@@ -290,7 +290,9 @@
                     "Other",
                 ];
 
-                // Current month filter (YYYY-MM)
+                // Current month filter (YYYY-MM). Always defaults to today's
+                // real month on load — a stale persisted month would otherwise
+                // hide the app behind last month's (now-frozen) view.
                 let currentMonth = new Date().toISOString().slice(0, 7); // "2026-04"
 
                 // DOM elements
@@ -350,8 +352,12 @@
                                 ];
                                 categories = merged;
                             }
-                            if (data.currentMonth)
-                                currentMonth = data.currentMonth;
+                            // Note: currentMonth is deliberately NOT restored
+                            // from storage. It stays pinned to today's real
+                            // month (set above) so the app always opens on
+                            // the current month; past months (and their
+                            // entries) remain fully intact and reachable via
+                            // the month dropdown, they're just not the default.
                         } catch (e) {
                             /* fallback */
                         }
